@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
+	"os"
 	"time"
 
 	pb "github.com/Skosuke/greetly/proto/hello"
@@ -11,10 +13,17 @@ import (
 )
 
 func main() {
+	name := flag.String("name", "Gopher", "挨拶する名前")
+	flag.Parse()
+	target := os.Getenv("GRPC_TARGET")
+    if target == "" {
+        // 環境変数が設定されていなければ、デフォルトはホスト用
+        target = "localhost:50052"
+    }
+    conn, err := grpc.NewClient("passthrough:///" + target,
+        grpc.WithTransportCredentials(insecure.NewCredentials()),
+    )
 	// NewClientで接続を作成（passthroughでローカル接続）
-	conn, err := grpc.NewClient("passthrough:///localhost:50051",
-			grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
 	if err != nil {
 			log.Fatalf("Failed to create client: %v", err)
 	}
@@ -35,7 +44,7 @@ func main() {
 
 	// クライアントの作成＆リモートメソッド呼び出し
 	client := pb.NewGreeterClient(conn)
-	res, err := client.SayHello(context.Background(), &pb.HelloRequest{Name: "Gopher"})
+	res, err := client.SayHello(context.Background(), &pb.HelloRequest{Name: *name})
 	if err != nil {
 			log.Fatalf("Could not greet: %v", err)
 	}

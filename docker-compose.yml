@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '50052:50051'
+    command: ['./server']
+
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - GRPC_TARGET=server:50051
+    depends_on:
+      - server
+    command: ['./client']
