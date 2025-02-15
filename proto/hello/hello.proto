@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package hello;
+
+// Go 用のパッケージ指定：<モジュールパス>/<ディレクトリ>; <パッケージ名>
+// 例: github.com/Skosuke/greetly/proto/hello パッケージを hello として利用
+option go_package = "github.com/Skosuke/greetly/proto/hello;hello";
+
+// Greeter サービスの定義
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloResponse);
+}
+
+// リクエストメッセージ
+message HelloRequest {
+  string name = 1;
+}
+
+// レスポンスメッセージ
+message HelloResponse {
+  string message = 1;
+}
